@@ -1,8 +1,17 @@
 {
-  "dependencies": {
-    "inquirer": "^9.2.22",
-    "mysql2": "^3.9.7",
-    "node": "^18.20.3",
-    "pg": "^8.11.5"
+    "name": "employee_management_system",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "inquirer": "^8.2.4",
+      "pg": "^8.11.5",
+      "asciiart-logo": "^0.2.7"
+    }
   }
-}
