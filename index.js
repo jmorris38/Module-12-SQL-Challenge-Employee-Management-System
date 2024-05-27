@@ -1,18 +1,16 @@
-// Prompt user to use the methods off of the class db in order to execute operations in the database.
 const { prompt } = require("inquirer");
 const logo = require("asciiart-logo");
-const db = require("./db"); // const db = new DB();
+const db = require("./db");
 
 init();
 
 // Display logo text for the , load main prompts
 function init() {
   const logoText = logo({ name: "Employee Management System" }).render();
-// Console log the logo text and load the main prompts
   console.log(logoText);
   loadMainPrompts();
 }
-// Function to load the main prompts for the user to select what they would like to do from the list of choices
+
 function loadMainPrompts() {
   prompt([
     {
@@ -30,7 +28,6 @@ function loadMainPrompts() {
         { name: "Exit", value: "exit" },
       ],
     },
-    // Switch case for the user choice to run the corresponding function because when the user selects an option the choice with the corresponding value will be run
   ]).then(async (userData) => {
     switch (userData.choice) {
       case "findAllDepartments":
@@ -62,27 +59,22 @@ function loadMainPrompts() {
         await updateEmployeeRole();
         break;
       default:
-        // If the user selects exit then the application will exit
         console.log("You have selected to exit the application");
         process.exit();
     }
   });
 }
-// Function to find all of the department table data
+
 function findAllDepartments() {
-  // Console log that the function is running
   console.log("Found all departments");
-  // Call the findAllDepartments method from the db class
   db.findAllDepartments()
-  // Then destructure the rows from the result and console.table the departments
     .then(({ rows }) => {
       let departments = rows;
       console.table(departments);
     })
-    // Then load the main prompts
     .then(() => loadMainPrompts());
 }
-// Function to find all of the role table data
+
 function findAllRoles() {
   console.log("Found all roles");
   db.findAllRoles()
@@ -92,41 +84,37 @@ function findAllRoles() {
     })
     .then(() => loadMainPrompts());
 }
-// Function to find all of the employee table data
+
 function findAllEmployees() {
   console.log("Found all employees");
   db.findAllEmployees()
     .then(({ rows }) => {
-      let departments = rows;
-      console.table(departments);
+      let employees = rows;
+      console.table(employees);
     })
     .then(() => loadMainPrompts());
 }
-// Creates a department with the data from the user
+
 function createDepartment() {
-  // Prompt the user for the name of the department
   prompt([
     {
       type: "input",
       name: "name",
       message: "What is the name of the department?",
     },
-    // Then create the department with the name response from the user
   ]).then((data) => {
     db.createDepartment(data.name)
-    // Then console log that the department was added to the database and load the main prompts
       .then(() => {
         console.log("Added department to the database");
         loadMainPrompts();
       })
-      // Catch any errors and console log the error and load the main prompts
       .catch((err) => {
         console.error("Error adding department", err);
         loadMainPrompts();
       });
   });
 }
-// Creates role with the data from the user
+
 function createRole() {
   prompt([
     {
@@ -150,8 +138,19 @@ function createRole() {
       .then(() => loadMainPrompts());
   });
 }
-// Creates employee with the data from the user
-function createEmployee() {
+
+async function createEmployee() {
+  const roles = await db.findAllRolesForChoices();
+  //console.log(roles);
+  const roleChoices = roles.rows.map(role => ({ name: role.title, value: role.title }));
+
+  const employees = await db.findAllEmployees();
+  //console.log(employees);
+  const managerChoices = [{ name: "None", value: "None" }].concat(employees.rows.map(employee => ({
+    name: `${employee.employee_first_name} ${employee.employee_last_name}`,
+    value: `${employee.employee_first_name} ${employee.employee_last_name}`
+  })));
+
   prompt([
     {
       type: "input",
@@ -167,28 +166,13 @@ function createEmployee() {
       type: "list",
       name: "role_title",
       message: "What is the employee's role?",
-      choices: [
-        "Demand Manager",
-        "Supply Chain Associate",
-        "Procurement Manager",
-        "Procurement Associate",
-        "Operations Manager",
-        "Operations Associate",
-      ],
+      choices: roleChoices,
     },
     {
       type: "list",
-      name: "manager_name",
+      name: "manager_id",
       message: "Who is the employee's manager?",
-      choices: [
-        "None",
-        "Justin Morris",
-        "Bob Hamper",
-        "Paul Lane",
-        "James Sheldon",
-        "Dom Gingham",
-        "Mia Reynolds",
-      ],
+      choices: managerChoices,
     },
   ]).then((data) => {
     db.createEmployee(data)
@@ -196,47 +180,35 @@ function createEmployee() {
       .then(() => loadMainPrompts());
   });
 }
-// Updates employee role with the data from the user
-function updateEmployeeRole() {
-  // Prompt the user for the employee they would like to update and the new role they would like to assign
-  const dataPromise = prompt([
+
+async function updateEmployeeRole() {
+  const employees = await db.findAllEmployees();
+  const employeeChoices = employees.rows.map(employee => ({
+    name: `${employee.first_name} ${employee.last_name}`,
+    value: employee.id
+  }));
+
+  const roles = await db.findAllRoles();
+  const roleChoices = roles.rows.map(role => ({
+    name: role.title,
+    value: role.id
+  }));
+
+  prompt([
     {
       type: "list",
       name: "employeeId",
       message: "Which employee's role do you want to update?",
-      choices: [
-        "Joshua Carter",
-        "Bobby Hamper",
-        "Terry Lane",
-        "Lisa Sheldon",
-        "Sherry Gingham",
-        "Petricia Reynolds",
-      ],
+      choices: employeeChoices,
     },
     {
       type: "list",
-      name: "title",
+      name: "roleId",
       message: "Which role do you want to assign the selected employee?",
-      choices: [
-        "Demand Manager",
-        "Supply Chain Associate",
-        "Procurement Manager",
-        "Procurement Associate",
-        "Operations Manager",
-        "Operations Associate",
-      ],
+      choices: roleChoices,
     },
-  ]);
-
-  dataPromise.then((data) => {
-    console.log("Updating employee role...");
-    console.log("Employee ID:", data.employeeId);
-    console.log("New Role:", data.title);
-
-    db.updateEmployeeRole({
-      employee_name: data.employeeId,
-      role_title: data.title,
-    })
+  ]).then((data) => {
+    db.updateEmployeeRole(data.employeeId, data.roleId)
       .then(() => {
         console.log("Employee role updated successfully");
         loadMainPrompts();

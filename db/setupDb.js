@@ -1,6 +1,5 @@
-
-
-
+// This is to create database and add values in tables
+// Do not need to run everytime just run if you haven't setup your DB
 const { Client } = require('pg');
 
 const createDatabaseAndTables = async () => {

@@ -26,6 +26,11 @@ class DB {
       `SELECT role.title AS "Job Title", role.id, department.department_name, role.salary FROM role JOIN department ON role.department_id = department.id`
     );
   }
+  findAllRolesForChoices() {
+    return this.query(
+      `SELECT role.title, role.id, department.department_name, role.salary FROM role JOIN department ON role.department_id = department.id`
+    );
+  }
   // Finds all employees
   findAllEmployees() {
     // Query to select all employees and change the manager_id to the manager's name using a LEFT JOIN on the employee table
