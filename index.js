@@ -182,16 +182,15 @@ async function createEmployee() {
 }
 
 async function updateEmployeeRole() {
-  const employees = await db.findAllEmployees();
-  const employeeChoices = employees.rows.map(employee => ({
-    name: `${employee.first_name} ${employee.last_name}`,
-    value: employee.id
-  }));
+  const roles = await db.findAllRolesForChoices();
+  //console.log(roles);
+  const roleChoices = roles.rows.map(role => ({ name: role.title, value: role.title }));
 
-  const roles = await db.findAllRoles();
-  const roleChoices = roles.rows.map(role => ({
-    name: role.title,
-    value: role.id
+  const employees = await db.findAllEmployees();
+  //console.log(employees);
+  const employeeChoices = employees.rows.map(employee => ({
+    name: `${employee.employee_first_name} ${employee.employee_last_name}`,
+    value: `${employee.employee_first_name} ${employee.employee_last_name}`
   }));
 
   prompt([
