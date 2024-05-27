@@ -193,7 +193,7 @@ async function updateEmployeeRole() {
     value: `${employee.employee_first_name} ${employee.employee_last_name}`
   }));
 
-  prompt([
+  const dataPromise = prompt([
     {
       type: "list",
       name: "employeeId",
@@ -202,12 +202,21 @@ async function updateEmployeeRole() {
     },
     {
       type: "list",
-      name: "roleId",
+      name: "title",
       message: "Which role do you want to assign the selected employee?",
       choices: roleChoices,
     },
-  ]).then((data) => {
-    db.updateEmployeeRole(data.employeeId, data.roleId)
+  ]);
+
+  dataPromise.then((data) => {
+    console.log("Updating employee role...");
+    console.log("Employee ID:", data.employeeId);
+    console.log("New Role:", data.title);
+
+    db.updateEmployeeRole({
+      employee_name: data.employeeId,
+      role_title: data.title,
+    })
       .then(() => {
         console.log("Employee role updated successfully");
         loadMainPrompts();
