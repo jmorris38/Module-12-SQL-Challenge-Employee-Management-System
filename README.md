@@ -11,8 +11,9 @@ I WANT to be able to view and manage the departments, roles, and employees in my
 <br>
 SO THAT I can organize and plan my business
 
+## WalkThrough Video
 
- ## Installation
+## Installation
 
  Install the following:
  <br>
@@ -24,7 +25,7 @@ SO THAT I can organize and plan my business
  ## Prerequisites
  PgAdmin 4, PostgresSQL 15 
 
- ## Website Preview
+ ## Preview
  <img src="./assets/images/1.PNG" width="720" heigth="480">
 
  <img src="./assets/images/2.PNG" width="720" heigth="480">
